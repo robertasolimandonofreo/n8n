@@ -1,0 +1,373 @@
+{
+  "name": "Slackbot",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8fa0d712-1076-49b7-82da-e98390182ac6",
+              "name": "command_text",
+              "type": "string",
+              "value": "={{ $json.body.text }}"
+            },
+            {
+              "id": "ef82aa1f-2882-4970-b10a-86e7faef6562",
+              "name": "user",
+              "type": "string",
+              "value": "={{ $json.body.user_name }}"
+            },
+            {
+              "id": "633fe37e-850c-4e95-8728-f19ceb4afe76",
+              "name": "response_url",
+              "type": "string",
+              "value": "={{ $json.body.response_url }}"
+            },
+            {
+              "id": "bbab2bb9-3e90-41c4-b5be-8c7873c61707",
+              "name": "request_token",
+              "type": "string",
+              "value": "={{ $json.body.token }}"
+            },
+            {
+              "id": "3e6dd0e2-fec4-48cb-a44c-1342a8eb619c",
+              "name": "command_name",
+              "type": "string",
+              "value": "={{ $json.body.command }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3fab88ce-4a80-483b-b558-12e111f16c98",
+      "name": "var",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        480,
+        280
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "slack",
+        "options": {
+          "binaryPropertyName": "data",
+          "rawBody": true,
+          "responseData": "Iniciando o workflow..."
+        }
+      },
+      "id": "99cab485-4099-4505-9c9e-33ea389818e5",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        280,
+        280
+      ],
+      "webhookId": "a14585bb-b757-410e-a5b2-5f05a087b388",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "={{ $json.response_url }}",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"attachments\": [\n{\n\"text\": \"/n8n comando 0 OU /n8n outro comando 1 OU /n8n ajuda\"\n}\n]\n}"
+      },
+      "id": "fa194440-53c2-472f-9436-c46c9ec315f4",
+      "name": "Ajuda",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1360,
+        -40
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "={{ $json.response_url }}",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"attachments\": [\n{\n\"text\": \"Comando 1\"\n}\n]\n}"
+      },
+      "id": "6e600e5b-6211-4e66-9ca2-f08d7939d08b",
+      "name": "Outro comando",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1420,
+        580
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "={{ $json.response_url }}",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"attachments\": [\n{\n\"text\": \"Comando 0\"\n}\n]\n}"
+      },
+      "id": "1375085e-6239-4751-b76e-e6f4e006f953",
+      "name": "Comando",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1400,
+        360
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "={{ $json.response_url }}",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"attachments\": [\n{\n\"text\": \"Comando vazio, digite #n8n ajuda\"\n}\n]\n}"
+      },
+      "id": "e56875c4-ce2b-4639-aabc-21f1562a3858",
+      "name": "Comando vazio",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1360,
+        -220
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "={{ $json.response_url }}",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n\"attachments\": [\n{\n\"text\": \"Comando desconhecido, digite #n8n ajuda\"\n}\n]\n}"
+      },
+      "id": "450cfd4c-a4ce-4a3b-b780-237b4ac18be8",
+      "name": "Comando desconhecido",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1360,
+        980
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$node[\"var\"].json[\"command_text\"]}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "vazio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "5f5f2550-ac1c-4232-b791-0d86af17f37f",
+                    "leftValue": "={{$node[\"var\"].json[\"command_text\"]}}",
+                    "rightValue": "ajuda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ajuda"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "7988b93d-36aa-4360-972f-48ef5614c028",
+                    "leftValue": "={{$node[\"var\"].json[\"command_text\"]}}",
+                    "rightValue": "comando 0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comando"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "15ce92f7-0e5b-4530-ab18-1c4473e20334",
+                    "leftValue": "={{$node[\"var\"].json[\"command_text\"]}}",
+                    "rightValue": "comando 1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "outro comando"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "f6413092-2f28-43e1-a6ee-c885fd2e2e39",
+                    "leftValue": "={{$node[\"var\"].json[\"command_text\"]}}",
+                    "rightValue": "comando 1, comando 0, ajuda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comando desconhecido"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ab2969a9-1050-4094-b69d-79b9af2233b8",
+      "name": "Trocar",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        660,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "var": {
+      "main": [
+        [
+          {
+            "node": "Trocar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "var",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trocar": {
+      "main": [
+        [
+          {
+            "node": "Comando vazio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ajuda",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Comando",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Outro comando",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Comando desconhecido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f4476ade-bb11-44f4-9592-8e503810925f",
+  "meta": {
+    "templateId": "2157",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "afa0c50f17021d31eb6006374e2b3053248c523f39c699273ba21b827d065b2b"
+  },
+  "id": "aNiDCLnxVLWmVmeG",
+  "tags": []
+}
